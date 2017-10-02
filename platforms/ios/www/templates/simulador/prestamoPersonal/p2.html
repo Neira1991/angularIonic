@@ -1,0 +1,27 @@
+<h6>Tasa de de cr&eacute;dito</h6>
+<form name="personale2" class="m-formClient">
+    <div class="-fields">
+        <label>Tasa periódica M.V.</label>
+        <input type="text" ng-numberfake ng-change="equivalenciaTasaNominal()" ng-percent ng-model="datos2.tasaperiodica" required>
+    </div>
+
+    <div class="-fields">
+        <div class="-group">
+            <span>Equivalencia</span>
+            <label>Tasa nominal M.V.</label>
+        </div>
+        <a>{{datos2.tasanominal}}</a>
+    </div>
+
+    <div class="-fields">
+        <div class="-group">
+            <span>Equivalencia</span>
+            <label>Tasa efectiva anual</label>
+        </div>
+        <a>{{datos2.tasaefectivaNual}}</a>
+    </div>
+
+    <div class="-button green w100">
+        <span class="w60" ng-click="next(personale2)">Siguiente</span>
+    </div>
+</form>

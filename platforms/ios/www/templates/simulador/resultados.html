@@ -1,0 +1,87 @@
+<div class="-resultados-simulador">
+    <div class="-scroll">
+        <div class="m-banner">
+            <div class="-table">
+                <ul class="-resumen">
+                    <li ng-repeat="r in datosPrestamo" class="{{r.class}}" ng-show="r.active == true">
+                        <p class="-subname" ng-show="r.Subname">{{ r.Subname }}</p>
+                        <span>{{ r.name }}</span>
+                        <span>{{ r.val }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="-list -summaryList">
+            <div class="second-summary" ng-if="datosPrestamo2 != undefined">
+              <div class="-table">
+                  <ul class="-resumen">
+                      <li ng-repeat="r in datosPrestamo2" ng-show="r.active == true">
+                          <p class="-subname" ng-show="r.Subname">{{ r.Subname }}</p>
+                          <span>{{ r.name }}</span>
+                          <span>{{ r.val }}</span>
+                      </li>
+                  </ul>
+              </div>
+            </div>
+            <h5>Resumen</h5>
+            <h6>Datos del cliente</h6>
+            <div class="m-formClient">
+
+                <div class="-fields">
+                    <label>{{ $rootScope.clientInfo.name }}</label>
+                </div>
+
+                <div class="-fields">
+                    <label>{{ $rootScope.clientInfo.lastName }}</label>
+                </div>
+
+                <div class="-fields">
+                    <label>{{ $rootScope.clientInfo.mail }}</label>
+                </div>
+
+                <div class="-fields">
+                    <label>{{ $rootScope.clientInfo.cell }}</label>
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="-summary" ng-repeat="s in summary">
+            <h6>{{ s.title }}</h6>
+            <div class="-fields" ng-repeat="f in s.fields" ng-show="f.active">
+                <span>{{ f.name }}</span>
+                <span>{{ f.val }}</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="-buttons">
+        <div class="-button green w50">
+            <!-- <span class="w80" ng-click="sendmailCotizacion()">Enviar</span> -->
+            <span ng-dialigboxoptions class="w80">Enviar</span>
+            <div class="m-tooltip green">
+                <span>OPCIONES</span>
+                <ul>
+                    <li ng-click="sendmailCotizacion()">Enviar por email</li>
+                    <!-- <li>Enviar por whatsapp</li> -->
+                    <li ng-click="newCotiuser()">Crear una nueva cotizacion</li>
+                </ul>
+            </div>
+        </div>
+        <div class="-button blue w50">
+            <!-- <span class="w80" ng-click="finalizar()">Finalizar</span> -->
+            <span ng-dialigboxoptions class="w80">Finalizar</span>
+            <div class="m-tooltip blue">
+                <span>ESTADO</span>
+                <ul>
+                    <li ng-click="registrosUpdate('Cotizado')">Cotizado</li>
+                    <li ng-click="registrosUpdate('En Seguimiento')">En seguimiento</li>
+                    <li ng-click="registrosUpdate('Desembolsado')">Desembolsado</li>
+                    <li ng-click="registrosUpdate('Desembolsado con seguro')">Desembolsado con seguro</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+</div>

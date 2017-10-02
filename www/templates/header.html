@@ -1,0 +1,38 @@
+<header class="o-main-header">
+
+
+  <div class="a-open-menu" ng-click="open = !open" ng-show="!simulador"></div>
+  <div class="a-overlayer" ng-class="{open: open == true}" ng-click="open = !open"></div>
+
+  <div ng-show="alert.show" class="-alert">
+    <span>{{alert.msgAlert}}</span>
+    <div class="-site-btns">
+      <div class="-closeB" ng-click="cancel(false)"></div>
+      <div ng-show="alert.check" ng-click="cancel(true)" class="-checkB"></div>
+    </div>
+  </div>
+
+  <div class="o-menu" ng-class="{open: open == true}" ng-show="!simulador">
+    <div class="-closeButton" ng-click="open = !open">X</div>
+    <div class="-logo">
+      <img src="img/36_LogoBOCC_Menu.svg" alt="">
+      <p style=" font-size: 13px;color: #c9c9c9;">version: 1.21</p>
+    </div>
+    <ul>
+      <li ng-click="mInicio();open = !open">Inicio</li>
+      <li ng-click="initSimulate();open = !open">Simuladores</li>
+      <li ng-click="mHistorial();open = !open">Historial</li>
+      <li ng-click="mSeguros();open = !open">Seguros</li>
+      <li ng-click="mPerfil();open = !open">Perfil</li>
+    </ul>
+    <div class="-close" ng-click="exit()">Cerrar sesi&oacute;n</div>
+  </div>
+
+
+  <div class="a-return" ng-show="simulador" ng-click="prev()"></div>
+
+  <span class="a-title">{{ $rootScope.title | uppercase }}</span>
+  <div ng-show="pagesActive" class="a-pages-menu">{{ pagesNumber }}</div>
+
+  <div class="a-exit" ng-show="simulador" ng-click="cancel()"></div>
+</header>

@@ -1,0 +1,42 @@
+<h6>Monto y plazo</h6>
+<form name="vivienda1" class="m-formClient">
+    <div class="-fields">
+        <label>Valor del inmueble</label>
+        <input ng-numberfake ng-money type="tel" ng-model="datos1.monto" required>
+    </div>
+
+    <div class="-fields">
+        <div class="-group">
+            <label>Cuota inicial o<br /> Valor Canon Extra</label>
+        </div>
+        <input ng-numberfake ng-money type="tel" ng-model="datos1.cuotaInicial" required>
+    </div>
+
+    <div class="-fields">
+        <div class="-group">
+            <span>Valor</span>
+            <label>Leasing o cr&eacute;dito hipotecario</label>
+        </div>
+        <input ng-numberfake ng-money type="tel" ng-model="datos1.Leasing" required>
+    </div>
+
+    <div class="-fields">
+        <label>Plazo en meses</label>
+        <input type="number" ng-model="datos1.plazomeses" required>
+    </div>
+
+    <div class="-fields">
+        <label>Opción de compra %</label>
+        <input ng-numberfake ng-percent type="tel" ng-change="opcionComprafunc()" ng-model="datos1.opciondecomprapor" required>
+    </div>
+
+    <!--<div class="-fields" >
+        <label>Opción de compra</label>
+        <a>{{ datos1.opcionCompreField || 0 }}</a>
+    </div>-->
+
+
+    <div class="-button green w100">
+        <span class="w60" ng-click="next(vivienda1)">Siguiente</span>
+    </div>
+</form>

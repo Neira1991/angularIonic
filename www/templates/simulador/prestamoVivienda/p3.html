@@ -1,0 +1,44 @@
+<h6>TASA DE CRÉDITO</h6>
+<form name="vivienda3" class="m-formClient">
+    <div ng-show="datos2.tasaperiodica == 'Fija'" class="-fields">
+        <label>Tasa fija</label>
+        <input ng-numberfake ng-percent type="tel" ng-change="tasa()" ng-if="(datos2.tasaperiodica == 'Variable')? datos3.tasafija = '0': true " ng-model="datos3.tasafija" required>
+    </div>
+
+    <div ng-show="datos2.tasaperiodica == 'Fija'" class="-fields">
+        <label>Tasa</label>
+        <a>{{datos3.tasa}}</a>
+    </div>
+
+    <div class="-fields">
+        <label>Vivienda Protegida</label>
+        <div class="a-select" ng-sl>
+            <span></span>
+            <ul>
+                <li ng-click="datos3.viendaprotegida = '$0'">Ninguna</li>
+                <li ng-click="datos3.viendaprotegida = '$23.133'">Bronce</li>
+                <li ng-click="datos3.viendaprotegida = '$30.202'">Plata</li>
+                <li ng-click="datos3.viendaprotegida = '$112.455'">Oro</li>
+                <li ng-click="datos3.viendaprotegida = '$187.424'">Titanio</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="-fields">
+        <label>Cuota Protegida</label>
+        <div class="a-select" ng-sl>
+            <span></span>
+            <ul>
+                <li ng-click="datos3.cuotapreotegida = '$0'">Ninguna</li>
+                <li ng-click="datos3.cuotapreotegida = '$92.841'">Plata</li>
+                <li ng-click="datos3.cuotapreotegida = '$185.578'">Oro</li>
+                <li ng-click="datos3.cuotapreotegida = '$247.438'">Titanio</li>
+            </ul>
+        </div>
+    </div>
+
+
+    <div class="-button green w100">
+        <span class="w60" ng-click="next(vivienda3)">Siguiente</span>
+    </div>
+</form>

@@ -1,0 +1,63 @@
+<h6>CUOTA MENSUAL</h6>
+<form name="fromVehiculo23" class="m-formClient">
+    <div class="-fields">
+        <label>Tasa final al cliente</label>
+        <a>{{datos3.tasafinalCliente}}</a>
+    </div>
+
+    <div class="-fields">
+        <label>Monto Extra Cuota 1</label>
+        <input ng-numberfake type="text" ng-money ng-model="datos3.montoExtracuota1" required>
+    </div>
+
+    <div class="-fields">
+        <label>Mes Extra Cuota 1</label>
+        <div class="a-select" ng-sl>
+          <span></span>
+          <ul>
+            <li ng-click="datos2.mesExtracuota1 = 'ENERO' ">ENERO</li>
+            <li ng-click="datos2.mesExtracuota1 = 'FEBRERO' ">FEBRERO</li>
+            <li ng-click="datos2.mesExtracuota1 = 'MARZO' ">MARZO</li>
+            <li ng-click="datos2.mesExtracuota1 = 'ABRIL' ">ABRIL</li>
+            <li ng-click="datos2.mesExtracuota1 = 'MAYO' ">MAYO</li>
+            <li ng-click="datos2.mesExtracuota1 = 'JUNIO' ">JUNIO</li>
+            <li ng-click="datos2.mesExtracuota1 = 'JULIO' ">JULIO</li>
+            <li ng-click="datos2.mesExtracuota1 = 'AGOSTO' ">AGOSTO</li>
+            <li ng-click="datos2.mesExtracuota1 = 'SEPTIEMBRE' ">SEPTIEMBRE</li>
+            <li ng-click="datos2.mesExtracuota1 = 'OCTUBRE' ">OCTUBRE</li>
+            <li ng-click="datos2.mesExtracuota1 = 'NOVIEMBRE' ">NOVIEMBRE</li>
+            <li ng-click="datos2.mesExtracuota1 = 'DICIEMBRE' ">DICIEMBRE</li>
+          </ul>
+        </div>
+    </div>
+
+    <div class="-fields">
+        <label>Monto Extra Cuota 2</label>
+        <input ng-numberfake type="text" ng-money ng-model="datos3.montoExtracuota2" required>
+    </div>
+
+    <div class="-fields">
+        <label>Mes Extra Cuota 2</label>
+        <div class="a-select" ng-sl>
+          <span></span>
+          <ul>
+            <li ng-click="datos2.mesExtracuota2 = 'ENERO' ">ENERO</li>
+            <li ng-click="datos2.mesExtracuota2 = 'FEBRERO' ">FEBRERO</li>
+            <li ng-click="datos2.mesExtracuota2 = 'MARZO' ">MARZO</li>
+            <li ng-click="datos2.mesExtracuota2 = 'ABRIL' ">ABRIL</li>
+            <li ng-click="datos2.mesExtracuota2 = 'MAYO' ">MAYO</li>
+            <li ng-click="datos2.mesExtracuota2 = 'JUNIO' ">JUNIO</li>
+            <li ng-click="datos2.mesExtracuota2 = 'JULIO' ">JULIO</li>
+            <li ng-click="datos2.mesExtracuota2 = 'AGOSTO' ">AGOSTO</li>
+            <li ng-click="datos2.mesExtracuota2 = 'SEPTIEMBRE' ">SEPTIEMBRE</li>
+            <li ng-click="datos2.mesExtracuota2 = 'OCTUBRE' ">OCTUBRE</li>
+            <li ng-click="datos2.mesExtracuota2 = 'NOVIEMBRE' ">NOVIEMBRE</li>
+            <li ng-click="datos2.mesExtracuota2 = 'DICIEMBRE' ">DICIEMBRE</li>
+          </ul>
+        </div>
+    </div>
+
+    <div class="-button green w100">
+        <span class="w60" ng-click="next(fromVehiculo23)">Siguiente</span>
+    </div>
+</from>

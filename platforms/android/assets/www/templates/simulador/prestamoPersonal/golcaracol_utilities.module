@@ -1,0 +1,1758 @@
+<?php
+
+/**
+ * Implements hook_block_info().
+ */
+function golcaracol_utilities_block_info() {
+
+  //this block is show in header when user is login
+  $blocks['login'] = array(
+    'info' => t('GolCaracol: User Login'),
+    'cache' => DRUPAL_NO_CACHE
+  );
+  $blocks['logo'] = array('info' => t('GolCaracol: logo'));
+  $blocks['logo_footer'] = array('info' => t('GolCaracol: logo footer'));
+  $blocks['go_home_page'] = array('info' => t('GolCaracol: link home page'));
+  $blocks['static_footer'] = array('info' => t('GolCaracol: footer'));
+  $blocks['header_copa_america'] = array('info' => t('GolCaracol: header copa américa'));
+  $blocks['social_network_term_lp'] = array('info' => t('GolCaracol: social network term lpck'));
+  $blocks['link_more_news'] = array('info' => t('GolCaracol: link more news'));
+  $blocks['blu_iframe'] = array('info' => t('GolCaracol: Blu Radio Iframe'));
+  $blocks['links_recent_highlights'] = array('info' => t('Golcaracol: links recent highlights'));
+  $blocks['gc_user_login'] = array('info' => t('Golcaracol: User login'));
+
+  // This example comes from node.module.
+  $blocks['bar_live_broadcast'] = array(
+    'info' => t('Live broadcast bar'),
+    'cache' => DRUPAL_CACHE_GLOBAL
+  );
+
+  return $blocks;
+}
+
+
+/**
+ * Implements hook_block_configure().
+ */
+function golcaracol_utilities_block_configure($delta = '') {
+  $form = array();
+  if ($delta == 'bar_live_broadcast') {
+    $form['data_basic'] = array(
+      '#type' => 'fieldset',
+      '#title' => t('Basic data'),
+    );
+    $form['data_basic']['content'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Content'),
+      '#default_value' => variable_get('content_live_bar'),
+    );
+    $form['data_basic']['url'] = array(
+      '#type' => 'textfield',
+      '#title' => t('Url Content'),
+      '#default_value' => variable_get('url_live_bar'),
+    );
+    $form['data_basic']['location'] = array(
+      '#type' => 'radios',
+      '#title' => t('Location'),
+      '#options' => array(
+        t('Only Home'),
+        t('All pages'),
+      ),
+      '#default_value' => variable_get('location_live_bar'),
+    );
+  }
+  return $form;
+}
+
+
+/**
+ * Implements hook_block_save().
+ */
+function golcaracol_utilities_block_save($delta = '', $edit = array()) {
+  if ($delta == 'bar_live_broadcast') {
+    variable_set('content_live_bar', $edit['content']);
+    variable_set('location_live_bar', $edit['location']);
+    variable_set('url_live_bar', $edit['url']);
+  }
+}
+
+/**
+ * Implements hook_block_view().
+ */
+function golcaracol_utilities_block_view($delta = '') {
+  $block = array();
+  switch ($delta) {
+    case 'login':
+      global $user;
+      if (user_is_logged_in()) {
+        $block['content'] = theme('menu_user_login', array('uid' => $user->uid, 'name' => $user->name));
+      }
+      break;
+
+    case 'logo':
+      if (!$path = theme_get_setting('logo_path')) {
+        $path = theme_get_setting('logo');
+      }
+      $logo = array('path' => $path, 'alt' => 'GOLCARACOL.COM');
+      $block['content'] = theme('container', array(
+        'element' => array(
+          '#children' => l(theme('image', $logo), $GLOBALS['base_url'], array('html' => TRUE)),
+          '#attributes' => array(
+            'class' => array(
+              'container-logo',
+              $delta
+            )
+          )
+        )
+      ));
+      break;
+    case 'logo_footer':
+      if (!$path = theme_get_setting('footer_logo_path')) {
+        $path = theme_get_setting('logo');
+      }
+      $logo = array('path' => $path, 'alt' => 'GOLCARACOL.COM');
+      $block['content'] = theme('container', array(
+        'element' => array(
+          '#children' => l(theme('image', $logo), $GLOBALS['base_url'], array('html' => TRUE)),
+          '#attributes' => array(
+            'class' => array(
+              'container-logo',
+              $delta
+            )
+          )
+        )
+      ));
+      break;
+
+    case 'static_footer':
+      $block['content'] = theme('block_static_footer', array());
+      break;
+
+    case 'header_copa_america':
+      // calcula el numero de días restantes para el inicio de la copa américa.
+      $now = time();
+      $end = strtotime("2015-06-11");
+      $diff = $end - $now;
+      $days = ceil($diff / (60 * 60 * 24));
+      $block['content'] = theme('block_data_header', array('days' => $days));
+      break;
+
+    case 'go_home_page':
+      $block['content'] = theme('container', array(
+        'element' => array(
+          '#children' => l(t('VOLVER A GOL CARACOL'), $GLOBALS['base_url'], array('html' => TRUE)),
+          '#attributes' => array(
+            'class' => array('show-for-large-up', 'container-home-link'),
+          )
+        )
+      ));
+      break;
+
+    case 'social_network_term_lp':
+      $block['content'] = _block_gc_utilities_social_network_term_lp();
+      break;
+
+    case 'link_more_news':
+      $block['content'] = theme('container', array(
+        'element' => array(
+          '#children' => l(t('VER MÁS NOTICIAS'), 'http://www.copaamerica.golcaracol.com/noticias', array('html' => TRUE)),
+          '#attributes' => array(
+            'class' => array('container-link_more_news')
+          )
+        )
+      ));
+      break;
+
+    case 'blu_iframe':
+      $path = "http://static1.bluradio.com/copaamerica2015.html";
+      $block['content'] = theme('container', array(
+        'element' => array(
+          '#children' => '<iframe scrolling="no" src="' . $path . '"></iframe>',
+          '#attributes' => array(
+            'class' => array('container-blu')
+          )
+        )
+      ));
+      break;
+
+    case 'links_recent_highlights' :
+      $block['content'] = _golcaracol_utilities_block_recientes_destacados();
+      break;
+
+    case 'bar_live_broadcast' :
+      $block['content']['container'] = array(
+        '#type' => 'container',
+        '#attributes' => array(
+          'class' => 'bar_live_broadcast',
+        ),
+      );
+      $block['content']['container']['title'] = array(
+        '#type' => 'html_tag',
+        '#tag' => 'p',
+        '#value' => t('broadcasting')."<span>".t("live")."</span>",
+        '#attributes' => array(
+          'class' => 'title',
+        ),
+      );
+      $block['content']['container']['content'] = array(
+        '#type' => 'html_tag',
+        '#tag' => 'p',
+        '#value' => variable_get('content_live_bar'),
+        '#attributes' => array(
+          'class' => 'content',
+        ),
+      );
+      $block['content']['container']['link'] = array(
+        '#type' => 'html_tag',
+        '#tag' => 'a',
+        '#value' => "",
+        '#attributes' => array(
+          'class' => 'link',
+          'href' => variable_get('url_live_bar'),
+        ),
+      );
+      $block['content']['container']['close'] = array(
+        '#type' => 'html_tag',
+        '#tag' => 'div',
+        '#attributes' => array(
+          'class' => 'close',
+        ),
+      );
+      $sttLocalitation = variable_get('location_live_bar');
+      if( $sttLocalitation == 0 && !drupal_is_front_page()){
+        $block = NULL;
+      }
+      break;
+
+  }
+  return $block;
+}
+/**
+ * Implements hook_block_view_alter().
+ */
+function golcaracol_utilities_block_view_alter(&$data, $block){
+
+  if( $block->delta == "bar_live_broadcast" ){
+    $block->title = NULL;
+  }
+
+}
+
+/**
+ * Implements hook_theme_registry_alter().
+ */
+function golcaracol_utilities_theme_registry_alter(&$theme_registry) {
+
+  //Alter template block dfp rooks
+  if( isset($theme_registry['dfp_tag']) ){
+    $path = drupal_get_path('module', 'golcaracol_utilities')."/templates/dfp_tag";
+    $theme_registry['dfp_tag']['template'] = $path;
+  }
+}
+/**
+ * Implements hook_theme().
+ */
+function golcaracol_utilities_theme($existing, $type, $theme, $path) {
+  return array(
+    'menu_user_login' => array(
+      'template' => 'templates/block-menu-login',
+      'variables' => array('uid' => 0, 'name' => NULL)
+    ),
+    'block_static_footer' => array(
+      'template' => 'templates/block-static-footer',
+      'variables' => array()
+    ),
+    'block_data_header' => array(
+      'template' => 'templates/block-data-header',
+      'variables' => array('days' => 0)
+    ),
+    'embed_view_page' => array(
+      'template' => 'templates/embed-view-page',
+      'variables' => array(
+        'styles' => '',
+        'styles_footer' => '',
+        'scripts' => '',
+        'scripts_footer' => '',
+        'content' => '',
+      ),
+    ),
+    'image_gallery_formatter' => array(
+      'variables' => array(
+        'slides' => NULL,
+        'thumbs' => NULL,
+        'bigs' => NULL,
+        'full' => NULL,
+        'count' => NULL,
+      ),
+      'template' => 'templates/image_gallery_formatter'
+    ),
+  );
+}
+
+function _block_gc_utilities_social_network_term_lp() {
+  global $lp;
+  // Si el objeto LP contiene información
+  if (isset($lp->name)) {
+    // Se carga la configuración del bloque
+    $term = taxonomy_term_load($lp->tid);
+    $fields = field_info_instances('taxonomy_term', $term->vocabulary_machine_name);
+    foreach ($fields as $key => $field) {
+      if ($field['widget']['module'] == 'icck_social_networks') {
+        $field_name = $key;
+      }
+    }
+    if (!empty($field_name)) {
+      $display = array(
+        'label' => 'hidden',
+        'type' => 'social_simple_links',
+      );
+      $content = field_view_field('taxonomy_term', $term, $field_name, $display);
+      return $content;
+    }
+  }
+  return '';
+}
+
+/**
+ * Inform the menu_attributes module about custom attributes.
+ *
+ * @return
+ *   An array of attributes to be controlled by Menu Attributes, keyed by
+ *   attribute name. Each attribute record should be an array with the following
+ *   key/value pairs:
+ *   - label: The human-readable name of the attribute.
+ *   - description: The attribute description.
+ *   - form: A Form API array. Some default values for this array are provided
+ *     in menu_attributes_get_menu_attribute_info().
+ *   - scope: An array of scope options, MENU_ATTRIBUTES_LINK or
+ *     MENU_ATTRIBUTES_ITEM or both. If no scope is provided, both will
+ *     be assumed.
+ *
+ * @see menu_attributes_menu_attribute_info()
+ * @see menu_attributes_get_menu_attribute_info()
+ */
+function golcaracol_utilities_menu_attribute_info() {
+  // Add a Tabindex attribute.
+  $info['onclick'] = array(
+    'label' => t('Onclick'),
+    'description' => t('Specifies the onclick attribute in a link.'),
+    'scope' => array(MENU_ATTRIBUTES_LINK),
+  );
+  return $info;
+}
+
+function golcaracol_utilities_menu() {
+  $menu = array(
+    'embed_view/%/%' => array(
+      'page callback' => 'embed_view_render',
+      'page arguments' => array(1, 2),
+      'access arguments' => array('access content'),
+      'type' => MENU_CALLBACK,
+      'delivery callback' => 'embed_view_delivery',
+    ),
+    'utilities/cache-clear/%' => array(
+      'page callback' => '_gc_utilities_clear_cache_page',
+      'page arguments' => array(2),
+      'access arguments' => array('utilities clear cache'), //hook permission
+      'type' => MENU_CALLBACK,
+    ),
+  );
+  return $menu;
+}
+
+function _gc_utilities_clear_cache_page($bin = 'page') {
+  cache_clear_all(NULL, 'cache_' . $bin);
+  if (variable_get('gc_utilities_cache_log', FALSE)) {
+    watchdog('golcaracol_utilities', 'Cleared cache for %bin', array('%bin' => 'cache_' . $bin), WATCHDOG_INFO);
+  }
+  drupal_set_message(t('Cleared cache for %bin', array('%bin' => 'cache_' . $bin)));
+  drupal_goto();
+}
+
+function golcaracol_utilities_permission() {
+  return array(
+    'utilities clear cache' => array(
+      'title' => t('Utilities clear cache'),
+      'description' => t('Run clear cache.'),
+    ),
+  );
+}
+
+function golcaracol_utilities_cron() {
+
+  cache_clear_all(NULL, 'cache_page');
+  if (variable_get('gc_utilities_cache_log', FALSE)) {
+    watchdog('golcaracol_utilities', 'Cleared cache for cron', array('%bin' => 'cache_page'), WATCHDOG_INFO);
+  }
+}
+
+/**
+ * ALter username to email
+ */
+function golcaracol_utilities_email_registration_name($edit, $account) {
+
+  return $account->mail;
+}
+
+function golcaracol_utilities_rudi_user_pre_register($form, &$form_state) {
+
+  $form_state['values']['name'] = $form_state['values']['mail'];
+}
+
+function embed_view_render($name, $display_id) {
+  $args = func_get_args();
+  $cid = '';
+  if (count($args) > 2) {
+    $args = array_slice($args, 2);
+    $cid = implode('-', $args);
+  }
+  else {
+    $args = NULL;
+  }
+  $cid = "embed_view-{$name}-{$display_id}-$cid";
+  $cache = cache_get($cid);
+  if (isset($cache->data)) {
+    return $cache->data;
+  }
+  drupal_static_reset('drupal_add_css');
+  $css = array(
+    'http://static.golcaracol.com.s3.amazonaws.com/especiales-golcaracol/copa-america/statistics/css/foundation.css',
+    'http://static.golcaracol.com.s3.amazonaws.com/especiales-golcaracol/copa-america/statistics/css/styles.css',
+  );
+  foreach ($css as $style) {
+    drupal_add_css($style, array('type' => 'external'));
+  }
+  drupal_static_reset('drupal_add_js');
+  $js = array(
+    'http://static.golcaracol.com.s3.amazonaws.com/especiales-golcaracol/copa-america/statistics/js/jquery.js',
+    'http://static.golcaracol.com.s3.amazonaws.com/especiales-golcaracol/copa-america/statistics/js/foundation.min.js',
+  );
+  foreach ($js as $script) {
+    drupal_add_js($script, array('type' => 'external'));
+  }
+  $js_foundation = '$(document).ready(function(){$(document).foundation();$("a").each(function(){var a=$(this).attr("href");0<a.length&&"/"==a.charAt(0)&&($(this).attr("href","http://copaamerica.golcaracol.com"+a),$(this).attr("target","_blank"))})});';
+  drupal_add_js($js_foundation, array('type' => 'inline', 'scope' => 'footer'));
+  $scripts = drupal_add_js();
+  if (isset($scripts["misc/drupal.js"])) {
+    unset($scripts["misc/drupal.js"]);
+  }
+  if (isset($scripts["settings"])) {
+    unset($scripts["settings"]);
+  }
+  $args = func_get_args();
+  if (count($args) > 2) {
+    $args = array_slice($args, 2);
+  }
+  else {
+    $args = NULL;
+  }
+  $attributes = '';
+  $header = '';
+  if ($name == 'matches') {
+    $attributes = drupal_attributes(array(
+      'class' => 'pane-matches calendario_home'
+    ));
+    $header = '<h2 class="pane-title">Los partidos de la fecha</h2>';
+  }
+  else {
+    drupal_add_css('http://static.elespectador.com.s3.amazonaws.com/copa-america/estadisticas/css/styles.css', array('type' => 'external'));
+  }
+
+  $content['#theme'] = 'embed_view_page';
+  $content['#styles'] = drupal_get_css();
+  $content['#scripts'] = drupal_get_js('header', $scripts);
+  $content['#content'] = array(
+    '#prefix' => "<div {$attributes}>",
+    '#suffix' => "</div>",
+    'header' => array('#markup' => $header),
+    'view' => array('#markup' => views_embed_view($name, $display_id, $args)),
+  );
+  $content['#content'] = render($content['#content']);
+  $content['#scripts_footer'] = drupal_get_js('footer');
+  cache_set($cid, $content, 'cache', time() + 60);
+  return $content;
+}
+
+function embed_view_delivery($page_callback_result) {
+  print render($page_callback_result);
+}
+
+function golcaracol_utilities_preprocess_page(&$variables) {
+  if (isset($variables['node'])) {
+    global $lp;
+    $lp_name = isset($lp->name) ? $lp->name : 'Torneo';
+    drupal_set_title($variables['node']->title . ' | ' . $lp_name);
+  }
+}
+
+/**
+ * Implements hook_field_widget_form_alter().
+ */
+function golcaracol_utilities_field_widget_form_alter(&$element, &$form_state, $context) {
+  if ($context['field']['type'] == 'image' && $context['instance']['widget']['type'] == 'image_image' && !empty($context['instance']['settings']['alt_field'])) {
+
+    foreach (element_children($element) as $delta) {
+      $element[$delta]['#process'][] = '_golcaracol_utilities_image_field_widget_process';
+    }
+  }
+}
+
+/**
+ * Image field process callback
+ */
+function _golcaracol_utilities_image_field_widget_process(&$element, &$form_state, $form) {
+  // Set title maxlength, if accessible
+  $maxlength = 300;
+  $element['alt']['#access'] = TRUE;
+  if ($element['alt']['#access']) {
+    $element['alt']['#maxlength'] = $maxlength;
+  }
+  if (isset($element['image_field_caption'])) {
+    $element['image_field_caption']['#attributes'] = array('maxlength' => $maxlength);
+    $element['image_field_caption']['#wysiwyg'] = FALSE;
+  }
+  return $element;
+}
+
+/**
+ * ####  Inicio Galeria Gol Caracol ###
+ *
+ *
+ * Implements hook_field_formatter_info().
+ */
+function golcaracol_utilities_field_formatter_info() {
+  return array(
+    'image_gallery_formatter' => array(
+      'label' => t('Image for gallery formater'),
+      'field types' => array(
+        'image',
+      ),
+      'settings' => array(
+        'slide_style' => 'large',
+        'thumb_style' => 'thumbnail',
+        'full_style' => 'full_style'
+      ),
+      'description' => t('Display multi-value fields for an Image gallery.'),
+    ),
+    'nodereference_type_taxo_date' => array(
+      'label' => t('Type, Taxonomy, Date, Title'),
+      'description' => t('Display extra information of the referenced node'),
+      'field types' => array('node_reference'),
+      'settings' => array(
+        'link' => FALSE,
+      ),
+    ),
+    'taxonomy_term_autor_photo' => array(
+      'label' => t('Autor with photo'),
+      'description' => t('Display the complete information of author'),
+      'field types' => array('taxonomy_term_reference'),
+    ),
+  );
+}
+/**
+ * Implements hook_field_formatter_settings_summary().
+ */
+function golcaracol_utilities_field_formatter_settings_summary($field, $instance, $view_mode) {
+
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $summary[] = t('Slides style: @value', array('@value' => $settings['slide_style']));
+  $summary[] = t('Thumbnails style: @value', array('@value' => $settings['thumb_style']));
+  $summary[] = t('Link to the node referenced @value', array('@value' => $settings['link']));
+
+  return implode('<br />', $summary);
+}
+
+/**
+ * Implements hook_field_formatter_settings_form().
+ */
+function golcaracol_utilities_field_formatter_settings_form($field, $instance, $view_mode, $form, &$form_state) {
+  $display = $instance['display'][$view_mode];
+  $settings = $display['settings'];
+  $form = array();
+  if ($display['type'] == 'image_gallery_formatter') {
+    foreach (image_styles() as $id => $style) {
+      $options[$id] = $id;
+    }
+    $form['slide_style'] = array(
+      '#type' => 'select',
+      '#title' => t('Select the slide style'),
+      '#options' => $options,
+      '#default_value' => $settings['slide_style'],
+      '#description' => t('Select the imagecache style you would like to show when clicked on the thumbnail.'),
+    );
+    $form['thumb_style'] = array(
+      '#type' => 'select',
+      '#title' => t('Select the thumbnail style'),
+      '#options' => $options,
+      '#default_value' => $settings['thumb_style'],
+      '#description' => t('Select the imagecache style you would like to show for the thumbnails list.'),
+    );
+    $form['full_style'] = array(
+      '#type' => 'select',
+      '#title' => t('Select the fullscreen style'),
+      '#options' => $options,
+      '#default_value' => $settings['full_style'],
+      '#description' => t('Select the imagecache style you would like to show for the fullscreen list.'),
+    );
+  }
+
+  if ($display['type'] == 'nodereference_type_taxo_date') {
+    $display = $instance['display'][$view_mode];
+    $form['link'] = array(
+        '#title' => t('Link label to the node referenced'),
+        '#type'  => 'checkbox',
+        '#default_value' => $settings['link'],
+    );
+  }
+
+  return $form;
+}
+
+/**
+ * Implements hook_field_formatter_view().
+ */
+function golcaracol_utilities_field_formatter_view($entity_type, $entity, $field, $instance, $langcode, $items, $display) {
+  $element = array();
+  $settings = $display['settings'];
+  switch ($display['type']) {
+    case 'image_gallery_formatter':
+      if (empty($items)) {
+        return $element;
+      }
+      $render_items = array();
+      foreach ($items as $delta => $item) {
+        if (isset($item['image_field_caption']) && !empty($item['image_field_caption']['value'])) {
+          $render_items['slides'][$delta]['alt'] = drupal_html_to_text(check_markup($item['image_field_caption']['value'], $item['image_field_caption']['format']));
+        }
+        elseif (isset($item['alt']) && !empty($item['alt'])) {
+          $render_items['slides'][$delta]['alt'] = check_plain($item['alt']);
+        }
+        else {
+          $render_items['slides'][$delta]['alt'] = '';
+        }
+
+        $render_items['slides'][$delta]['image'] = theme('image_formatter', array(
+          'item' => $item,
+          'image_style' => $settings['slide_style'],
+            )
+        );
+        $render_items['thumbs'][$delta]['image'] = image_style_url($settings['thumb_style'], $item['uri']);
+        $render_items['full'][$delta]['image'] = image_style_url($settings['full_style'], $item['uri']);
+        $render_items['bigs'][$delta]['image'] = file_create_url($item['uri']);
+      }
+      //return $element;
+      $element['#theme'] = 'image_gallery_formatter';
+      $element['#bigs'] = $render_items['bigs'];
+      $element['#slides'] = $render_items['slides'];
+      $element['#thumbs'] = $render_items['thumbs'];
+      $element['#full'] = $render_items['full'];
+      $element['#count'] = count($items);
+      return array($element);
+      break;
+    case 'nodereference_type_taxo_date':
+      if (empty($items)) {
+        return $element;
+      }
+      foreach ($items as $delta => $item) {
+        if ($item['access']) {
+          $node = node_load($item['nid']);
+
+          if ($node->status) {
+            $label = entity_label('node', $node);
+            if ($display['settings']['link']) {
+              $uri = entity_uri('node', $node);
+              $element[$delta] = array(
+                '#type'    => 'link',
+                '#title'   => $label,
+                '#href'    => $uri['path'],
+                '#options' => $uri['options'],
+              );
+            }
+            else {
+              $element[$delta] = array(
+                '#markup' => check_plain($label),
+              );
+            }
+            if (isset($node->field_torneo['und'][0]['target_id'])) {
+              $eid = $node->field_torneo['und'][0]['target_id'];
+              $entity_type = 'lpck';
+              $lp = entity_load_single($entity_type, $eid);
+              $term = taxonomy_term_load($lp->tid);
+              $term_path = drupal_get_path_alias('taxonomy/term/' . $lp->tid);
+            }
+
+            $prefix = '<div class="item-node-referenced">';
+            if (!empty($term_path)) {
+              $prefix .= '<span class="nr-term">' . l($term->name, $term_path) . '</span>';
+            }
+            $created = _golcaracol_utilities_fields_extra_format_date($node->created);
+            if (!empty($created)) {
+              $prefix .= '<span class="nr-date">' . $created . '</span>';
+            }
+            $element[$delta]['#options']['html'] = TRUE;
+            $element[$delta]['#title'] = '<span class="nr-icon"><div class="' . $node->type . '-type"></div></span>' . $label;
+            $element[$delta]['#prefix'] = $prefix;
+            $element[$delta]['#suffix'] = '</div>';
+          }
+        }
+      }
+      return $element;
+      break;
+    case 'taxonomy_term_autor_photo':
+      if( !empty($items) ){
+        $term = taxonomy_term_load( $items[0]['tid'] );
+        $urlImagen = "";
+        if( !empty($term->field_imagen) ){
+          $urlImagen = file_create_url($term->field_imagen['und'][0]['uri']);
+        }
+        $element[] = array(
+          'title' => array(
+            '#title' => 'a',
+            '#prefix' => t('for: '),
+            '#markup' => '<img src="'.$urlImagen.'" />',
+            '#suffix' => $term->name,
+          )
+        );
+      }
+      return $element;
+      break;
+  }
+
+}
+
+function _golcaracol_utilities_fields_extra_format_date($created) {
+  $today = date('d/m/Y', REQUEST_TIME);
+  $yesterday = date('d/m/Y', REQUEST_TIME - 86400);
+  $date = date('d/m/Y', $created);
+  $hour = date('H:i a');
+
+  $output = '';
+  if ($date == $today) {
+    $output = t('Today') . ", {$hour}";
+  }
+  elseif ($date == $yesterday) {
+    $output = t('Yesterday') . ", {$hour}";
+  }
+  else {
+    $output = $date;
+  }
+
+  return $output;
+}
+
+/**
+ *
+ * ####  Fin Galeria Gol Caracol ###
+ *
+ */
+
+/**
+ * Implements hook_preprocess_HOOK
+ * https://api.drupal.org/api/drupal/modules!system!theme.api.php/function/hook_preprocess_HOOK/7
+ *
+ * @param string $variables
+ */
+function golcaracol_utilities_preprocess_image_field_caption(&$variables) {
+  $arg0 = arg(0);
+  $arg1 = arg(1);
+
+  if ($arg0 == 'jscroll_view_entity') {
+    $args = explode("/", $_GET['q']);
+    $arg0 = $args[1];
+    $arg1 = $args[2];
+  }
+
+  if ($arg0 == 'node' && is_numeric($arg1)) {
+    // Keep the caption as is
+  }
+  else {
+    // Remove caption when is not in a node page
+    $variables['caption'] = '';
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ *
+ * @param array $form
+ * @param type $form_state
+ * @param type $form_id
+ */
+function golcaracol_utilities_form_field_ui_field_edit_form_alter(&$form, &$form_state, $form_id) {
+  // Increase the max cardinality to 15
+  $range = drupal_map_assoc(range(1, 15));
+  $new_options = array(FIELD_CARDINALITY_UNLIMITED => t('Unlimited')) + $range;
+
+  // Change the options
+  $form['field']['cardinality']['#options'] = $new_options;
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ *
+ * @param type $form
+ * @param type $form_state
+ * @param type $form_id
+ */
+function golcaracol_utilities_form_user_login_block_alter(&$form, &$form_state, $form_id) {
+  if ($form_id == 'user_login_block') {
+    // Mover los links al final del formulario
+    $form['links']['#weight'] = 1000;
+
+    if (empty($form['pass']['#attributes'])) {
+      $form['pass']['#attributes'] = array();
+    }
+    $form['pass']['#attributes']['autocomplete'] = 'off';
+
+    if (empty($form['name']['#attributes'])) {
+      $form['name']['#attributes'] = array();
+    }
+    $form['name']['#attributes']['autocomplete'] = 'off';
+  }
+}
+
+/**
+ * Limit the number of characters when creating especiales terms
+ *
+ * Implements hook_form_FORM_ID_alter
+ *
+ * @param type $form
+ * @param type $form_state
+ * @param type $form_id
+ */
+function golcaracol_utilities_form_taxonomy_form_term_alter(&$form, &$form_state, $form_id) {
+  if ($form['#vocabulary']->machine_name == 'especiales') {
+    $title_maxlength = 80;
+    $form['name']['#maxlength'] = $title_maxlength;
+
+    $maxlength = 250;
+    $form['description']['#attributes'] = array('maxlength' => $maxlength);
+    $form['description']['#wysiwyg'] = FALSE;
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ *
+ * @param type $form
+ * @param type $form_state
+ * @param type $form_id
+ */
+function golcaracol_utilities_form_video_node_form_alter(&$form, &$form_state, $form_id) {
+  $maxlength = 250;
+  // field_lead es un campo de tipo container y para acceder a las propiedades
+  // del textarea se debe ingresar a [LANGUAGE_NONE][0]['value']
+  $form['field_lead'][LANGUAGE_NONE][0]['value']['#attributes'] = array('maxlength' => $maxlength);
+
+  $maxlengthMeta = 170;
+  $form['body']['und'][0]['summary']['#wysiwyg'] = FALSE;
+  $form['body']['und'][0]['summary']['#attributes'] = array('maxlength' => $maxlengthMeta);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ *
+ * @param type $form
+ * @param type $form_state
+ * @param type $form_id
+ */
+function golcaracol_utilities_form_article_node_form_alter(&$form, &$form_state, $form_id) {
+  $maxlength = 250;
+  // field_lead es un campo de tipo container y para acceder a las propiedades
+  // del textarea se debe ingresar a [LANGUAGE_NONE][0]['value']
+  $form['field_lead'][LANGUAGE_NONE][0]['value']['#attributes'] = array('maxlength' => $maxlength);
+
+  $maxlengthMeta = 170;
+  $form['body']['und'][0]['summary']['#wysiwyg'] = FALSE;
+  $form['body']['und'][0]['summary']['#attributes'] = array('maxlength' => $maxlengthMeta);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ *
+ * @param type $form
+ * @param type $form_state
+ * @param type $form_id
+ */
+function golcaracol_utilities_form_gallery_node_form_alter(&$form, &$form_state, $form_id) {
+  $maxlength = 250;
+  // field_lead es un campo de tipo container y para acceder a las propiedades
+  // del textarea se debe ingresar a [LANGUAGE_NONE][0]['value']
+  $form['field_lead'][LANGUAGE_NONE][0]['value']['#attributes'] = array('maxlength' => $maxlength);
+
+  $maxlengthMeta = 170;
+  $form['body']['und'][0]['summary']['#wysiwyg'] = FALSE;
+  $form['body']['und'][0]['summary']['#attributes'] = array('maxlength' => $maxlengthMeta);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Modifica la url de los resultados de busqueda por defecto
+ */
+function golcaracol_utilities_form_search_block_form_alter(&$form, &$form_state, $form_id) {
+  $search_string = '';
+  if (arg(0) == 'buscar') {
+    $search_string = check_plain(arg(1));
+  }
+  $form['#action'] = '/buscar';
+  $form['#submit'] = array('_golcaracol_utilities_search_form_submit');
+  $form['search_block_form']['#default_value'] = $search_string;
+}
+
+function _golcaracol_utilities_search_form_submit(&$form, &$form_state) {
+  $form['search_block_form']['#default_value'] = 'Diferente';
+  $fv = $form_state['values'];
+  // Replace keys with their rawurlencoded value
+  if (isset($fv['search_block_form'])) {
+    $raw_keys = $fv['search_block_form'];
+    // $raw_keys = str_replace("/", "%2f", $fv['keys']);
+    $form_state['redirect'] = url('buscar/' . $raw_keys, array('absolute' => TRUE));
+  }
+}
+
+/**
+ * Implements hook_init()
+ */
+function golcaracol_utilities_init() {
+  $path = current_path();
+  $path_alias = drupal_lookup_path('alias', $path);
+  $patterns = 'tags/*';
+
+  if (drupal_match_path($path, $patterns) || drupal_match_path($path_alias, $patterns)) {
+
+    if( is_null($_POST['sort']) ){
+      $_POST['sort'] = "DESC";
+    }
+    $_POST['sort_order'] = $_POST['sort'];
+
+    // Si la url ya trae los filtros no se hacen ajustes
+    $url_query = drupal_get_query_parameters();
+    if (!empty($url_query)) {
+      return;
+    }
+
+    $types = _golcaracol_utilities_get_content_types_by_current_term();
+    $valid_types = array(
+      'article',
+      'gallery',
+      'video',
+    );
+    $content_types = array_intersect($types, $valid_types);
+    // Si la url no trae los filtros por defecto, estos se asignan manualmente
+    $parameters = array(
+      'content_type' => $content_types,
+    );
+    //drupal_goto($path, array('query' => $parameters));
+  }
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter
+ * @param type $form
+ * @param type $form_state
+ */
+function golcaracol_utilities_form_views_exposed_form_alter(&$form, &$form_state) {
+
+
+  if($form_state['view']->name == 'team_per_competition_statistics' &&
+    ($form["#id"] == 'views-exposed-form-team-per-competition-statistics-block-9'  ||
+     $form["#id"] == 'views-exposed-form-team-per-competition-statistics-block-8')) {
+
+
+    $tid = $form_state["view"]->args[0];
+    //Consultar las competiciones(términos) relacionadas con el equipo(término)
+    //usando la entidad teams_per_competition
+    $result = db_query(" SELECT td.tid,td.name
+                FROM {field_data_field_team}  ft
+                INNER JOIN  {field_data_field_competition} fc ON ft.entity_id  = fc.entity_id
+                INNER JOIN  {taxonomy_term_data} td ON td.tid  = fc.field_competition_target_id
+                AND field_team_target_id = :tid
+                AND ft.entity_type = 'teams_per_competition'
+                AND ft.bundle = 'teams_per_competition'
+               ",array(":tid"=>$tid))->fetchAll();
+
+    $options = array();
+
+    if(is_array($result)) {
+
+      $current_value = $form_state['input']['field_competition_target_id'];
+
+      $default = $result[0]->tid;
+
+      foreach($result as $competition) {
+        $options[$competition->tid] = $competition->name;
+      }
+      if(!isset($options[$current_value])) {
+        $form_state['input']['field_competition_target_id'] = $default;
+      }
+
+    }
+
+    $form['field_competition_target_id'] = array(
+      '#type'    => 'select',
+      '#options' => $options,
+    );
+  }
+
+
+  if ($form_state['view']->name == 'tags' && $form['#id'] == 'views-exposed-form-tags-panel-pane-1') {
+    // Ocultar los tipos de contenido que no aparezcan referenciados en
+    // los resultados
+    $types = _golcaracol_utilities_get_content_types_by_current_term();
+    foreach ($form['content_type']['#options'] as $key => $option) {
+      if (!in_array($key, $types, TRUE)) {
+        unset($form['content_type']['#options'][$key]);
+      }
+    }
+
+    // Modificar el orden de aparición de las opciones de ordenamiento
+    $options = $form['sort']['#options'];
+    $keys = array();
+    $values = array();
+    foreach ($options as $key => $value) {
+      $keys[] = $key;
+      $values[] = $value;
+    }
+
+    $new_options = array();
+    foreach ($values as $key => $value) {
+      $new_key = 1 - $key;
+      $new_options[$keys[$new_key]] = $values[$new_key];
+    }
+
+    $form['sort']['#options'] = $new_options;
+  }
+
+  if ($form_state['view']->name == 'search_solr' && $form['#id'] == 'views-exposed-form-search-solr-vpn-search-results') {
+    // Modificar el orden de aparición de los checkboxes
+    $type_options = array(
+      'article' => 'Artículos',
+      'video' => 'Videos',
+      'gallery' => 'Galerías',
+    );
+    $form['type']['#options'] = $type_options;
+
+    // Modificar el orden de aparición de las opciones de ordenamiento
+    $options = $form['sort']['#options'];
+    $keys = array();
+    $values = array();
+    foreach ($options as $key => $value) {
+      $keys[] = $key;
+      $values[] = $value;
+    }
+
+    $new_options = array();
+    foreach ($values as $key => $value) {
+      $new_key = 1 - $key;
+      $new_options[$keys[$new_key]] = $values[$new_key];
+    }
+
+    $form['sort']['#options'] = $new_options;
+  }
+}
+
+/**
+ * Devuelve un array con el listado de tipos de contenidos a los cuales
+ * pertenecen los nodos vinculados al termino actual
+ *
+ * @return array
+ */
+function _golcaracol_utilities_get_content_types_by_current_term() {
+  $tid = arg(2);
+  $result = db_query("SELECT
+                          node.type
+                        FROM
+                          {node} INNER JOIN
+                          {taxonomy_index} ON node.nid = taxonomy_index.nid
+                        WHERE
+                          taxonomy_index.tid = :tid AND node.status = '1'
+                        GROUP BY
+                          node.type", array(':tid' => $tid));
+  $types = array();
+  if ($result) {
+    while ($row = $result->fetchAssoc()) {
+      $types[] = $row['type'];
+    }
+  }
+
+  return $types;
+}
+
+/**
+ * Implements hook_taxonomy_term_presave
+ * @param type $term
+ */
+function golcaracol_utilities_taxonomy_term_presave($term) {
+  $v = taxonomy_vocabulary_load($term->vid);
+  if ($v->machine_name == 'ligas_y_torneos') {
+    $lp = $term->field_torneo['und'];
+    if (empty($lp)) {
+      if (empty($term->field_url['und'])) {
+        $term->field_url['und'] = array(
+          0 => array(
+            'value' => '<none>',
+          ),
+        );
+      }
+    }
+    else {
+      if (empty($term->field_url['und'])) {
+        $lpck = lpck_load_by_id($lp[0]['target_id']);
+        $tid = $lpck->tid;
+        $term->field_url['und'] = array(
+          0 => array(
+            'value' => 'taxonomy/term/' . $tid,
+          ),
+        );
+      }
+    }
+  }
+}
+
+/**
+ * Implements hook_entity_view
+ *
+ * @param type $entity
+ * @param type $type
+ * @param type $view_mode
+ * @param type $langcode
+ *
+ * @todo Ocultar el torneo con base en un argumento mas genérico
+ */
+function golcaracol_utilities_entity_view($entity, $type, $view_mode, $langcode) {
+  global $lp;
+
+  // Si no se puede identificar un lpck asociado a la ruta actual,  se oculta
+  // el torneo con base en la url
+  static $uri;
+  if (empty($uri)) {
+    $uri = request_uri();
+  }
+
+  $remove_on = array(
+    '/gc/noticias/futbol-rosa',
+    '/gc/noticias/colombianos-en-el-mundo',
+  );
+
+  if (in_array($uri, $remove_on, TRUE))  {
+    unset($entity->content['field_torneo']);
+  }
+
+  if(isset($entity->type) && $entity->type == "video" && ( $view_mode == "full" || $view_mode == "node_embed" ) ) {
+    $entity->content['field_main_image']['#access'] = FALSE;
+  }
+
+}
+
+/**
+ * Incluir el logo en las propiedades de la entidad lpck para que pueda
+ * ser usado en la configuracion de panels
+ *
+ * Implements hook_entity_property_info().
+ *
+ * @return array
+ */
+function golcaracol_utilities_entity_property_info() {
+  $info = array();
+  $properties = &$info['lpck']['properties'];
+
+  $properties['lpck_structure_logo'] = array(
+    'label'        => t("lpck structure logo"),
+    'description'  => t("lpck structure logo"),
+    'getter callback' => '_golcaracol_utilities_get_lpck_logo',
+  );
+
+  return $info;
+}
+
+/**
+ * Callback function for the logo property
+ *
+ * @param type $data
+ * @param array $options
+ * @param type $name
+ * @param type $type
+ * @param type $info
+ * @return type
+ */
+function _golcaracol_utilities_get_lpck_logo($data, array $options, $name, $type, $info) {
+  $lpck_str = lpck_structure_lpck_get_structure($data->name);
+  $fid = NULL;
+  if (isset($lpck_str->settings['logo']['logo_fid'])) {
+    $fid = $lpck_str->settings['logo']['logo_fid'];
+  }
+
+  $logo = '';
+  if (!empty($fid)) {
+    $file = file_load($fid);
+    $image = image_load($file->uri);
+
+    $image_item = array(
+      'path' => $image->source,
+      'width' => $image->info['width'],
+      'height' => $image->info['height'],
+    );
+
+    $logo = theme('image', $image_item);
+  }
+
+  return $logo;
+}
+
+/**
+ * Implements hook_views_api
+ */
+function golcaracol_utilities_views_api() {
+  return array(
+    'api' => 3,
+    'path' => drupal_get_path('module', 'golcaracol_utilities'),
+  );
+}
+
+/**
+ *  Implementation of hook_ds_fields_info().
+ */
+function golcaracol_utilities_ds_fields_info($entity_type) {
+  $fields = array();
+
+  $fields['node'] = array(
+    'disqus_comments_link' => array(
+      'title' => t('Disqus comments link'),
+      'field_type' => DS_FIELD_TYPE_FUNCTION,
+      'function' => '_golcaracol_utilities_ds_comments_link',
+    ),
+    'created_formatted' => array(
+      'title' => t('Node created date formatted'),
+      'field_type' => DS_FIELD_TYPE_FUNCTION,
+      'function' => '_golcaracol_utilities_ds_date_formatted',
+    ),
+    'node_type' => array(
+      'title' => t('Node type'),
+      'field_type' => DS_FIELD_TYPE_FUNCTION,
+      'function' => '_golcaracol_utilities_ds_node_type',
+    ),
+    'title_trimmed' => array(
+      'title' => t('Title trimmed'),
+      'field_type' => DS_FIELD_TYPE_FUNCTION,
+      'function' => '_golcaracol_utilities_ds_title_trimmed',
+      'properties' => array(
+        'settings' => array(
+          'link' => array(
+            'type' => 'select',
+            'options' => array(
+              0 => t('No'),
+              1 => t('Yes'),
+            ),
+            'description' => t('Show link')
+          ),
+          'trim_length' => array(
+            'type' => 'textfield',
+            'size' => 3,
+            'max_length' => 3,
+            'description' => t('Specify a trim length')
+          ),
+        ),
+      ),
+    ),
+  );
+
+  return $fields;
+}
+
+
+/**
+ * Implements hook_ds_field_settings_form().
+ */
+function golcaracol_utilities_ds_field_settings_form($field) {
+  return ds_ds_field_settings_form($field);
+}
+
+/**
+ * Implements hook_ds_field_format_summary().
+ */
+function golcaracol_utilities_ds_field_format_summary($field) {
+  return ds_ds_field_format_summary($field);
+}
+
+function _golcaracol_utilities_ds_comments_link(array &$field) {
+  global $base_url;
+
+  $entity = $field['entity'];
+  if (isset($entity->disqus) && $entity->disqus['status']) {
+    $render = array(
+      '#theme' => 'link',
+      '#text' => t('Comentarios'),
+      '#path' => 'javascript:void(0)',
+      '#options' => array(
+        'attributes' => array(
+          'onclick' => "Drupal.behaviors.disqus.getCommentsBox(this)",
+          'data-disqus-identifier' => 'node/' . $entity->nid,
+          'data-disqus-title' => $entity->title,
+          'data-disqus-url' => $base_url . url('node/' . $entity->nid),
+        ),
+        'html' => false,
+        'fragment' => '',
+        'external' => 'true',
+      ),
+    );
+    return drupal_render($render);
+  }
+  return;
+}
+
+function _golcaracol_utilities_ds_date_formatted(array &$field) {
+  $timezone = NULL;
+  $value = $field['entity']->created;
+  $second_format = 'custom';
+  $second_custom_format = 'F j, Y';
+  if (format_date(REQUEST_TIME, 'custom', 'Y-m-d', $timezone) == format_date($value, 'custom', 'Y-m-d', $timezone)) {
+    return t('Today, @hour', array('@hour' => format_date($value, 'custom', 'h:i a')));
+  }
+  elseif (format_date(REQUEST_TIME - 86400, 'custom', 'Y-m-d', $timezone) == format_date($value, 'custom', 'Y-m-d', $timezone)) {
+    return t('Yesterday, @hour', array('@hour' => format_date($value, 'custom', 'h:i a')));
+  }
+  else {
+    return format_date($value, $second_format, $second_custom_format, $timezone);
+  }
+}
+
+function _golcaracol_utilities_ds_node_type(array &$field) {
+  $text = '';
+  if ($field['bundle'] == 'video' && !empty($field['entity']->field_video_brightcove)) {
+    $video = brightcove_video_load($field['entity']->field_video_brightcove['und'][0]['brightcove_id']);
+    if(isset($video->length)) {
+      $text = gmdate("i:s", ceil($video->length / 1000));
+    } else {
+      $text = "00:00";
+    }
+  }
+  return "<div class='" . $field['bundle'] . "'>$text</div>";
+}
+
+function _golcaracol_utilities_ds_title_trimmed(array &$field) {
+  $settings = array();
+  $lenght = $field['formatter_settings']['trim_length'];
+  if (empty($length)) {
+    $length = 255;
+  }
+
+  $entity = $field['entity'];
+  $output = $field['entity']->title;
+
+  // Strip out line breaks
+  $output = preg_replace('/\n|\r|\t/m', ' ', $output);
+
+  // Strip out non-breaking spaces
+  $output = str_replace('&nbsp;', ' ', $output);
+  $output = str_replace("\xc2\xa0", ' ', $output);
+
+  // Strip out extra spaces
+  $output = trim(preg_replace('/\s\s+/', ' ', $output));
+
+  if (module_exists('views')) {
+    $output = views_trim_text(array(
+      'max_length' => $lenght,
+      'word_boundary' => TRUE,
+      'ellipsis' => FALSE,
+      'html' => FALSE,
+        ), $output);
+  }
+
+  if ($field['formatter_settings']['link']) {
+    $uri = entity_uri("node", $entity);
+    $url = $uri['path'];
+    $output = l($output, $url);
+  }
+
+  return $output;
+}
+
+/**
+ * Implements hook_module_implements_alter().
+ *
+ * Evita que se ejecute el hook_element_info() del módulo disqus
+ */
+function golcaracol_utilities_module_implements_alter(&$implementations, $hook) {
+  if ($hook == 'element_info') {
+    $group = $implementations['golcaracol_utilities'];
+    unset($implementations['golcaracol_utilities']);
+    unset($implementations['disqus']);
+
+    $implementations = array('golcaracol_utilities' => $group) + $implementations;
+  }
+}
+
+/**
+ * Implements hook_element_info().
+ *
+ * Sobreescribe la función disqus_element_info() para definir una función custom
+ * en el #post_render
+ */
+function golcaracol_utilities_element_info() {
+  $types['disqus'] = array(
+    '#disqus' => array(),
+    '#theme_wrappers' => array('disqus_noscript', 'container'),
+    '#attributes' => array('id' => 'disqus_thread'),
+    '#post_render' => array('_golcaracol_utilities_element_post_render'),
+  );
+  return $types;
+}
+
+/**
+ * Post render function of the Disqus element to inject the Disqus JavaScript.
+ *
+ * Esta función es practicamente igual a la que trae el módulo disqus,
+ * solo se modifica la ruda del archivo disqus.js que va a ser usado
+ */
+function _golcaracol_utilities_element_post_render($children, &$element) {
+  // Construct the settings to be passed in for Disqus.
+  $disqus = array(
+    'domain' => $element['#disqus']['domain'],
+    'url' => $element['#disqus']['url'],
+    'title' => $element['#disqus']['title'],
+    'identifier' => $element['#disqus']['identifier'],
+  );
+  if (isset($element['#disqus']['developer']) && $element['#disqus']['developer']) {
+    $disqus['developer'] = 1;
+  }
+
+  // If the user is logged in, we can inject the username and email for Disqus.
+  global $user;
+  if (variable_get('disqus_inherit_login', TRUE) && $user->uid > 0) {
+    $disqus['name'] = $user->name;
+    $disqus['email'] = $user->mail;
+  }
+
+  // Provide alternate language support if desired.
+  if (variable_get('disqus_localization', FALSE)) {
+    global $language;
+    $disqus['language'] = $language->language;
+  }
+
+  // Check if we are to provide Single Sign-On access.
+  if (variable_get('disqus_sso', FALSE)) {
+    $disqus += disqus_sso_disqus_settings($user);
+  }
+
+  /**
+   * Pass callbacks on if needed. Callbacks array is two dimensional array
+   * with callback type as key on first level and array of JS callbacks on the
+   * second level.
+   *
+   * Example:
+   * @code
+   * $element['#disqus']['callbacks'] = array(
+   *   'onNewComment' => array(
+   *     'myCallbackThatFiresOnCommentPost',
+   *     'Drupal.mymodule.anotherCallbInsideDrupalObj',
+   *   ),
+   * );
+   * @endcode
+   */
+  if (!empty($element['#disqus']['callbacks'])) {
+    $disqus['callbacks'] = $element['#disqus']['callbacks'];
+  }
+
+  // Add the disqus.js and all the settings to process the JavaScript and load Disqus.
+  $element['#attached']['js'][] = drupal_get_path('module', 'golcaracol_utilities') . '/js/disqus.js';
+  $element['#attached']['js'][] = array(
+    'type' => 'setting',
+    'data' => array(
+      'disqus' => $disqus,
+    ),
+  );
+  return $children;
+}
+
+/**
+ * Add filter based on the created date of the current node
+ *
+ * @param type $view
+ * @param type $query
+ * @return type
+ */
+function golcaracol_utilities_views_query_alter(&$view, &$query) {
+
+  if ($view->name == 'blog' && $view->current_display == 'bl_recent_posts') {
+    if (!empty($view->args)) {
+      $nid = $view->args[0];
+      $node = node_load($nid);
+    }
+    else {
+      return;
+    }
+    $conditions = array(
+      0 => array(
+        'field' => 'node.created',
+        'value' => $node->created,
+        'operator' => '<',
+      ),
+    );
+    $query->where[] = array(
+      'conditions' => $conditions,
+      'args' => array(),
+      'type' => 'AND',
+    );
+  } else if ($view->name == 'video_and_gallery_sortableviews' && isset($view->footer['html_link_more_content'])){
+    $link = $view->footer['html_link_more_content']->options['link_text'];
+    $url = $view->footer['html_link_more_content']->options['link_url'];
+    drupal_add_js(
+      array('view_load_more' => array('link' => $link, 'url' => $url)),
+      array('type' => 'setting')
+    );
+  } else if ( $view->name == 'tags' ){
+    $view->query->where[1]['conditions'][1] = array(
+      "field" => "node.type",
+      "value" => array( "article", "video", "gallery" ),
+      "operator" => "in",
+    );
+  }
+}
+
+function golcaracol_utilities_feeds_presave(FeedsSource $source, $entity, $item) {
+  $imageSrc = array();
+  preg_match_all('/<img[^>]+>/i',$entity->body['und'][0]['value'], $imgTags);
+  for ($i = 0; $i < count($imgTags[0]); $i++) {
+    preg_match('/src="([^"]+)/i',$imgTags[0][$i], $imgage);
+    $imageSrc[] = str_ireplace( 'src="', '',  $imgage[0]);
+  }
+  foreach($imageSrc as $image_path) {
+    $uri  = 'public://blogs/'.time().'.jpg';
+    $file = file_save_data(file_get_contents($image_path),$uri,FILE_EXISTS_REPLACE);
+    if ($file) {
+      $new_path     = file_create_url($uri);
+      $file->status = 1;
+      file_save($file);
+      $entity->body['und'][0]['value'] = str_replace($image_path,$new_path,$entity->body['und'][0]['value']);
+    }
+    else {
+      form_set_error('upload', t('Blog image upload failed.'));
+    }
+  }
+  $entity->path['pathauto'] = 0; // Required only if Pathauto is enabled.
+  $entity->path['alias']    = $entity->feeds_item->url;
+}
+
+
+/**
+ * Links to Recent and highlight content
+ */
+function _golcaracol_utilities_block_recientes_destacados() {
+  global $base_url;
+
+  $args = explode('/', current_path());
+
+  if (isset($args[0]) && ($args[0] == 'videos' || $args[0] == 'galerias')) {
+    $type = $args[0];
+    $sort = isset($args[1]) ? $args[1] : '';
+
+    $l_recent = $base_url . '/'.$type.'/recientes';
+    $l_highlights = $base_url . '/'.$type.'/destacados';
+  }
+
+  if (isset($args[0]) && isset($args[1]) && isset($args[2]) && $args[0] == 'seccion') {
+    $lp = $args[1];
+    $type = $args[2];
+    $sort = isset($args[3]) ? $args[3] : '';
+
+    $l_recent = $base_url . '/seccion/' . $lp . '/' . $type . '/recientes';
+    $l_highlights = $base_url . '/seccion/' . $lp . '/' . $type . '/destacados';
+  }
+
+  // Block output in HTML with div wrapper
+  $block = array(
+    'highlights' => array(
+      '#type' => 'link',
+      '#title' => t('Lo más destacado'),
+      '#href' => $l_highlights,
+      '#options' => array(
+        'attributes' => array(
+          'class' => $sort == 'destacados' ? array('active') : array(),
+        ),
+      ),
+    ),
+    'recent' => array(
+      '#type' => 'link',
+      '#title' => t('Lo más reciente'),
+      '#href' => $l_recent,
+      '#options' => array(
+        'attributes' => array(
+          'class' => $sort == 'recientes' || empty($sort) ? array('active') : array(),
+        ),
+      ),
+    ),
+  );
+
+  return $block;
+}
+
+
+/***Start feeds Brightcove**/
+
+function golcaracol_utilities_feeds_processor_targets_alter(&$targets, $entity_type, $bundle_name) {
+  foreach (field_info_instances($entity_type, $bundle_name) as $name => $instance) {
+    $info = field_info_field($name);
+
+    if ($info['type'] == 'brightcove_field') {
+      // Map a video by its url
+      $targets[$name. ':brightcove_video_url'] = array(
+            'name' => t('@name: Video from Brightcove by url', array('@name' => $instance['label'])),
+            'callback' => 'golcaracol_utilities_feeds_brightcove_video_set_target',
+            'description' => t('The @label field of the node.', array('@label' => $instance['label'])),
+          );
+
+      // Map a video directly by its brightcove id
+      $targets[$name. ':brightcove_video_id'] = array(
+            'name' => t('@name: Video from Brightcove by id', array('@name' => $instance['label'])),
+            'callback' => 'golcaracol_utilities_feeds_brightcove_video_set_target',
+            'description' => t('The @label field of the node.', array('@label' => $instance['label'])),
+        );
+      // If we need a player
+      $targets[$name. ':brightcove_video_player'] = array(
+            'name' => t('@name: Video Player Brightcove', array('@name' => $instance['label'])),
+            'callback' => 'golcaracol_utilities_feeds_brightcove_video_set_target',
+            'description' => t('The @label field of the node.', array('@label' => $instance['label'])),);
+    }
+  }
+}
+
+/**
+ * Callback for mapping. Here is where the actual mapping happens.
+ */
+function golcaracol_utilities_feeds_brightcove_video_set_target($source, $entity, $target, $value) {
+  if (empty($value)) {
+    return;
+  }
+  if (!is_array($value)) {
+    $value = array($value);
+  }
+
+  $player = "player_golcaracol";
+
+  // Iterate over all values.
+  $i = 0;
+  list($field_name, $sub_field) = explode(':', $target);
+  $field_info = field_info_field($field_name);
+  foreach ($value as $k => $v) {
+    if (!is_array($v) && !is_object($v)) {
+     if (strstr($target, 'brightcove_video_id')) {
+        $entity->{$field_name}['und'][$i]['brightcove_id'] = $v;
+     }
+     if (strstr($target, 'brightcove_video_player')) {
+        $entity->{$field_name}['und'][$i]['player'] = ($player ? $player : 'MDMC Player');
+     }
+    }
+    if ($field_info['cardinality'] == 1) {
+      break;
+    }
+    $i++;
+  }
+
+}
+/***End feeds Brightcove**/
+
+
+/**
+ * Implements hook_node_access().
+ *
+ * Muestra los jugadores no publicados para otros view modes diferentes a su despliegue
+ */
+function golcaracol_utilities_node_access($node, $op, $account) {
+  $type = is_string($node) ? $node : $node->type;
+  if($type == "player" && $op == "view" && arg(1)=="term") {
+    return NODE_ACCESS_ALLOW;
+  }
+}
+
+/**
+ * Implements hook_node_update().
+ *
+ * guarda todos los campos de torneo
+ */
+function golcaracol_utilities_node_update($node) {
+
+  $array = $node->field_torneo['und'];
+  $target_ids = array();
+  foreach ($array as $key => $value) {
+    $target_ids[$key] = $value['target_id'];
+  }
+  $entity = entity_load("lpck", $target_ids);
+  foreach ($entity as $key => $value) {
+    $nid = db_insert('taxonomy_index')
+    ->fields(array(
+      'nid' => $node->nid,
+      'tid' => $value->tid,
+      'created' => REQUEST_TIME,
+    ))
+    ->execute();
+  }
+
+}
+
+function golcaracol_utilities_form_alter(&$form, &$form_state, $form_id){
+  if( $form['#attributes']['class'][0] == 'node-form' ){
+    $form['actions']['submit']['#submit'][1] = 'node_form_submit';
+    $form['actions']['submit']['#submit'][0] = 'golcaracol_utilities_node_submit_handler';
+  }
+}
+function golcaracol_utilities_node_submit_handler($form, &$form_state){
+  $GLOBALS["alias_fix"] = $form_state['values']['path']['pathauto'];
+  if( $GLOBALS['alias_fix'] == 1 ){
+    $query = db_delete('url_alias')
+    ->condition('source', 'node/'.$form['nid']['#value'],'=')
+    ->execute();
+    //hacer un insert si se quiere conservar las demas urls generadas
+  }
+}
+
+/**
+ * Implements hook_admin_menu_cache_info().
+ *
+ * Add in a cache flush for cache manual JS/CSS.
+ */
+function golcaracol_utilities_admin_menu_cache_info() {
+  $caches['customcache'] = array(
+    'title' => t('Custom cache CSS/JS'),
+    'callback' => '_flush_cache_manual_css_js',
+  );
+  return $caches;
+}
+
+/**
+ * Cache clear callback for admin_menu/flush-cache/manual_css_js.
+ */
+function _flush_cache_manual_css_js() {
+  $query = db_delete('cache')
+  ->condition('cid', 'jsmin_%','like')
+  ->execute();
+}
+
+/**
+ * Implements hook_views_pre_render().
+ *
+ */
+function golcaracol_utilities_views_pre_render(&$view){
+  if ($view->query->pager->plugin_name !== 'infinite_scroll') {
+    return;
+  }
+  drupal_add_js(drupal_get_path('module', 'golcaracol_utilities') . '/js/view_infinite.js', array('scope' => 'footer'));
+}
+
+
+/**
+ * Implements hook_views_ajax_data_alter().
+ */
+function golcaracol_utilities_views_ajax_data_alter(&$commands, view $view) {
+  if (!isset($view->query->pager->plugin_name) || $view->query->pager->plugin_name !== 'infinite_scroll' || !isset($_GET['page'])) {
+    return;
+  }
+  foreach ($commands as $delta => &$command) {
+    $command['method'] = 'infiniteScrollInsertView2';
+    // Remove the behaviour of scrolling to the top of the page.
+    if ($command['command'] === 'viewsScrollTop') {
+      unset($commands[$delta]);
+    }
+  }
+}

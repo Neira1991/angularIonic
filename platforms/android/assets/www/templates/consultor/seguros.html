@@ -1,0 +1,13 @@
+<section class="o-datosp -segurosStatic">
+  <div class="m-banner">
+      <img src="img/banner/Header simulador_02.png" alt="">
+  </div>
+  <div class="-list">
+      <div ng-repeat="pages in pagesPost" class="-item" ng-click="nextSeguros(1,$index);">
+          <span>{{ pages.post_title }}</span>
+      </div>
+  </div>
+
+  <div ng-class="{show: sp1 == true }" class="o-pages" ng-include="'templates/consultor/seguros/page.html'"></div>
+
+</section>

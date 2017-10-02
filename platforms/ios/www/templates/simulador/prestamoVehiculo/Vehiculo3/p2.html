@@ -1,0 +1,53 @@
+<h6>MONTO Y PLAZO</h6>
+<form name="fromVehiculo32" class="m-formClient">
+    <div class="-fields">
+        <label>Monto Vehículo</label>
+        <input ng-numberfake ng-money type="text" ng-model="datos2.monto" name="" required>
+    </div>
+
+    <div class="-fields">
+        <label>Plazo / meses</label>
+        <input type="number" ng-model="datos2.plazoMes" ng-limit72 name="" required>
+    </div>
+
+    <div class="-fields">
+        <div class="-group">
+            <span>Tasa</span>
+            <label>Lista concesionario</label>
+        </div>
+        <input ng-numberfake type="text" ng-change="tasafinal()" ng-percent ng-model="datos2.listaConcesionario" name="" required>
+    </div>
+
+    <div class="-fields">
+        <label>Extra Prima</label>
+        <input ng-numberfake type="text" ng-percent ng-model="datos2.estraPrima" name="" required>
+    </div>
+
+    <div class="-fields">
+        <label>Tipo de Cliente</label>
+        <div class="a-select" ng-sl>
+            <span></span>
+            <ul>
+                <li ng-click="datos2.tipoCliente = 'E'">Empleado</li>
+                <li ng-click="datos2.tipoCliente = 'CB'">Cliente Banco</li>
+                <li ng-click="datos2.tipoCliente = 'CN'">Cliente Normal</li>
+            </ul>
+        </div>
+    </div>
+
+    <div ng-show="datos2.tasaperiodica == 1" class="-fields">
+        <label>Tipo de Plan</label>
+        <div class="a-select" ng-sl>
+            <span></span>
+            <ul>
+                <li ng-click="datos2.tipoPlan = 'P'">Plan Especial</li>
+                <li ng-click="datos2.tipoPlan = 'CD'">Canal Directo</li>
+                <li ng-click="datos2.tipoPlan = 'CO'">Concensionario</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="-button green w100">
+        <span class="w60" ng-click="next(fromVehiculo32)">Siguiente</span>
+    </div>
+</from>

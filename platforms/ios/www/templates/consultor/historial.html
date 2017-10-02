@@ -1,0 +1,15 @@
+<div class="m-list-report -historial">
+  <div class="-list">
+    <ul>
+      <span>{{ arrayMeses[n] }}</span>
+      <li ng-click="detailsOpen($index)" ng-repeat="data in listaCotizaciones" class="{{ data.class }}">
+        <p class="-date" ng-bind-html="data.post_date"></p>
+        <p class="-client">
+          <span class="-name">{{ data.fields.nombre_del_cliente }} {{ data.fields.apellido_del_cliente }}</span>
+          <span class="-type">{{ data.category }}</span>
+        </p>
+      </li>
+    </ul>
+  </div>
+  <div class="-loadScroll" ng-show="loadmoreScroll"></div>
+</div>

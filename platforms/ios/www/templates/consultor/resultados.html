@@ -1,0 +1,83 @@
+<div class="o-main-header">
+  <div class="a-return" style="display: block !important" ng-click="detailsClose()"></div>
+  <span class="a-title">{{ titleResultados }}</span>
+</div>
+
+<div class="-summary2">
+    <div class="-scroll">
+        <div class="m-banner">
+            <div class="-table">
+                <ul class="-resumen">
+                    <li>
+                        Resultados
+                        <p class="-subname" ng-show="datosPrestamoSeleted.category">{{ datosPrestamoSeleted.category }}</p>
+                    </li>
+                    <li class="{{r.class}}" ng-repeat="r in datosPrestamoSeleted.fieldsArray track by $index">
+                        <span>{{ r.name }}</span>
+                        <span>{{ r.value }}</span>
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div class="-list a-list -summaryList">
+          <div class="second-summary" ng-if="datosPrestamoSeleted.summaryArray2[1].data[0] != undefined">
+            <div class="-table">
+                <ul class="-resumen">
+                    <!-- <li>
+                      <p class="-subname">{{ datosPrestamoSeleted.summaryArray2[1].title }}</p>
+                      <span>&nbsp;</span>
+                      <span>&nbsp;</span>
+                    </li> -->
+                    <li ng-repeat="r in datosPrestamoSeleted.summaryArray2[1].data">
+                        <span>{{ r.name }}</span>
+                        <span>{{ r.value }}</span>
+                    </li>
+                </ul>
+            </div>
+          </div>
+            <h5>Resumen</h5>
+            <h6>Datos del cliente</h6>
+            <div class="-summary">
+
+                <div class="-fields" ng-repeat="dataPersona in datosPrestamoSeleted.PersonalArray">
+                    <label>{{ dataPersona.value }}</label>
+                </div>
+
+            </div>
+
+            <div class="-summary" ng-repeat="sArray in datosPrestamoSeleted.summaryArray">
+                <h6>{{ sArray.title }}</h6>
+                <div class="-fields" ng-repeat="fData in sArray.data">
+                    <span>{{ fData.name }}</span>
+                    <span>{{ fData.value }}</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="-buttons a-buttons">
+        <div class="-button blue w50">
+            <span ng-dialigboxoptions class="w80">OPCIONES</span>
+            <div class="m-tooltip blue">
+                <span>OPCIONES</span>
+                <ul>
+                    <li ng-click="mailclient()">Enviar por email</li>
+                    <!-- <li>Enviar por whatsapp</li> -->
+                    <li ng-click="newCotiuser()">Crear una nueva cotizacion</li>
+                </ul>
+            </div>
+        </div>
+        <div class="-button green w50">
+            <span ng-dialigboxoptions class="w80">ESTADO</span>
+            <div class="m-tooltip green">
+                <span>ESTADO</span>
+                <ul>
+                    <li ng-click="registrosUpdate('Cotizado')">Cotizado</li>
+                    <li ng-click="registrosUpdate('En Seguimiento')">En seguimiento</li>
+                    <li ng-click="registrosUpdate('Desembolsado')">Desembolsado</li>
+                    <li ng-click="registrosUpdate('Desembolsado con seguro')">Desembolsado con seguro</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</div>

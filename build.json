@@ -1,0 +1,18 @@
+{
+    "android": {
+        "debug": {
+            "keystore": "bancaseguros-key.keystore",
+            "storePassword": "Michaelca011",
+            "alias": "bancaseguros",
+            "password" : "Michaelca011",
+            "keystoreType": ""
+        },
+        "release": {
+            "keystore": "bancaseguros-key.keystore",
+            "storePassword": "Michaelca011",
+            "alias": "bancaseguros",
+            "password" : "Michaelca011",
+            "keystoreType": ""
+        }
+    }
+}

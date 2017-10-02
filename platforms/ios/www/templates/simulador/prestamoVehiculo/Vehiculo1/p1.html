@@ -1,0 +1,43 @@
+<h6>MODELO Y SEGURO</h6>
+<form name="fromVehiculo11" class="m-formClient">
+    <div class="-fields">
+        <label>Modelo Veh&iacute;culo</label>
+        <input type="number" ng-model="datos1.modeloVehiculo" required>
+    </div>
+
+    <div class="-fields">
+        <label>Edad Solicitante</label>
+        <input type="number" ng-model="datos1.edad" required>
+    </div>
+
+    <div class="-fields">
+        <div class="-group">
+            <span>Seguro</span>
+            <label>P&oacute;liza Colectiva</label>
+        </div>
+        <div class="-slide">
+            <i ng-click="datos1.polizaColectiva = 'SI'"></i>
+            {{datos1.polizaColectiva}}
+            <i ng-click="datos1.polizaColectiva = 'NO'" ></i>
+        </div>
+    </div>
+
+    <div class="-fields" ng-show="datos1.polizaColectiva == 'SI'">
+        <div class="-group">
+            <span>Seguro</span>
+            <label>Tranquilidad Global</label>
+        </div>
+        <div class="a-select" ng-sl>
+            <span></span>
+            <ul>
+                <li ng-click="datos2.tranquilidadglobal = 'TG'">TG</li>
+                <li ng-click="datos2.tranquilidadglobal = 'CPT'">CPT</li>
+                <li ng-click="datos2.tranquilidadglobal = 'CPM'">CPM</li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="-button green w100">
+        <span class="w60" ng-click="next(fromVehiculo11)">Siguiente</span>
+    </div>
+</from>

@@ -1,0 +1,43 @@
+<div class="-content">
+  <div ng-show="seguros == false" class="m-info-user" ng-click="$rootScope.mPerfil()">
+    <div class="a-text">
+      <span>hola</span>
+      <span class="-name">{{ user.data.name }}</span>
+      <span class="-date">{{ fechaDash }}</span>
+    </div>
+    <div class="a-image">
+      <div class="-img">
+        <div ng-bind-html="user.data.img"></div>
+      </div>
+    </div>
+  </div>
+  <div ng-show="reporteLista" class="o-statistics-user">
+    <div class="m-month">
+      <span class="-arrow a-left" ng-click="menosmes()"></span>
+      <ul>
+        <li ng-show="mesActual == $index" ng-repeat="mes in arrayMeses">{{mes}}</li>
+      </ul>
+      <span class="-arrow a-right" ng-click="masmes()"></span>
+    </div>
+    <div class="m-statistics-list">
+      <ul>
+        <li>
+          <span class="-munber">{{ listaCotizaciones.length + TotalDesembolsos }}</span>
+          <span class="-label">Cotizaciones</span>
+        </li>
+        <li>
+          <span class="-munber">{{ TotalDesembolsos }}</span>
+          <span class="-label">Desembolsos</span>
+        </li>
+        <li>
+          <span class="-munber">{{ percentPenetracion }}<i>%</i></span>
+          <span class="-label">penetración</span>
+        </li>
+        <li>
+          <span class="-munber">{{ percentEfectividad }}<i>%</i></span>
+          <span class="-label">efectividad</span>
+        </li>
+      </ul>
+    </div>
+  </div>
+</div>
